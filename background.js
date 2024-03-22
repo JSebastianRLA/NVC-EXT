@@ -1,118 +1,109 @@
-// Definir una variable global para almacenar los eventos
-var eventosAnteriores = [];
+// Definir una variable global para almacenar las credenciales y los eventos anteriores
+let credentials = null;
+let eventosAnteriores = [];
 const maxEventosAlmacenados = 10; // Definir el máximo de eventos almacenados
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "checkAPI") {
-        // Recuperar las credenciales almacenadas del almacenamiento local
-        chrome.storage.local.get(["dns", "apiPass", "username", "password"], function(items) {
-            const dns = items.dns;
-            const apiPass = items.apiPass;
-            const username = items.username;
-            const password = items.password;
-
-            // Verificar que todas las credenciales estén presentes antes de realizar la verificación de la API
-            if (dns && apiPass && username && password) {
-                // Construir la URL de la API utilizando los valores recuperados
-                const apiUrl = `https://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
-
-                // Obtener los datos de la API y verificar los cambios
-                checkAPIForChanges(apiUrl, sendResponse);
-            } else {
-                // Enviar una respuesta indicando que faltan credenciales
-                sendResponse({ success: false, error: "Faltan credenciales" });
-            }
-        });
-
-        // Necesario para mantener la conexión abierta mientras se espera la respuesta
-        return true;
-    }
+// Obtener las credenciales almacenadas del almacenamiento local al inicio
+chrome.storage.local.get(["credentials"], function (items) {
+  credentials = items.credentials;
 });
 
-function checkAPIForChanges(apiUrl, callback) {
-    // Obtener los datos de la API
-    fetch(apiUrl)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("La solicitud a la API falló: " + response.statusText);
+// No es necesario verificar las credenciales cada vez que se abre la extensión
+// Deja la lógica de verificación solo cuando se envían nuevas credenciales
+
+// Escuchar mensajes del script de contenido
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === "saveCredentials") {
+    // Almacenar las credenciales proporcionadas por el usuario
+    credentials = request.credentials;
+
+    // Guardar las credenciales en el almacenamiento local para su uso futuro
+    chrome.storage.local.set({ credentials: credentials });
+
+    sendResponse({ success: true }); // Confirmar que las credenciales se guardaron correctamente
+  }
+});
+
+// Definir la función para verificar cambios en la API
+function checkAPIForChanges() {
+  if (!credentials) {
+    console.log("Faltan credenciales para realizar la consulta a la API.");
+    return;
+  }
+
+  // Construir la URL de la API utilizando las credenciales almacenadas
+  const { dns, apiPass, username, password } = credentials;
+  const apiUrl = `https://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
+
+  // Obtener los datos de la API
+  fetch(apiUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("La solicitud a la API falló: " + response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      const nuevosEventos = data.data;
+      console.log("Eventos nuevos recibidos:", nuevosEventos.length);
+
+      // Filtrar los eventos que no estén en la lista de eventos almacenados
+      const eventosNuevos = nuevosEventos.filter((evento) => {
+        return !eventosAnteriores.some(
+          (eventoAnterior) => eventoAnterior.id_evento === evento.id_evento
+        );
+      });
+
+      console.log(data.data[0].event_type);
+      console.log("Eventos nuevos filtrados:", eventosNuevos);
+
+      // Si hay eventos nuevos, mostrar una notificación
+      if (eventosNuevos.length > 0) {
+        eventosNuevos.forEach((evento) => {
+          if (
+            evento.event_type === "going_up_critical" ||
+            evento.event_type === "going_down_warning" ||
+            evento.event_type === "going_up_warning"
+          ) {
+            console.log(evento.event_type);
+            let mensaje = "";
+            switch (evento.event_type) {
+              case "going_up_critical":
+                mensaje = "Hay un nuevo evento crítico.";
+                break;
+              case "going_down_warning":
+                mensaje = "Hay un nuevo evento peligroso.";
+                break;
+              case "going_up_warning":
+                mensaje = "Hay un nuevo evento peligroso.";
+                break;
             }
-            return response.text();
-        })
-        .then((text) => {
-            const data = JSON.parse(text);
-            // Verificar si la respuesta contiene un mensaje de error
-            if (text.includes("auth error")) {
-                throw new Error("Error de autenticación en la API: " + text);
-            }
-            // Obtener la lista de eventos
-            console.log(data);
-            const nuevosEventos = data.data;
-            const event = data.data.length;
-            const idagent = data.data.id_agente;
-            console.log("Eventos nuevos recibidos:", event);
-
-            // Filtrar los eventos que no estén en la lista de eventos almacenados
-            const eventosNuevos = nuevosEventos.filter((evento) => {
-                return !eventosAnteriores.some(
-                    (eventoAnterior) => eventoAnterior.id_evento === evento.id_evento
-                );
+            const fechaHoraActual = new Date().toLocaleString();
+            chrome.notifications.create(null, {
+              type: "basic",
+              iconUrl: "images/icon128.png",
+              title: "¡Nuevo evento!",
+              message: `${mensaje}, en el agente con ID ${evento.id_agente}, con fecha y hora: ${fechaHoraActual}`,
             });
-
-            // Mostrar solo los eventos más recientes
-            const eventosRecientes = eventosNuevos.slice(-maxEventosAlmacenados);
-            console.log("Eventos más recientes:", eventosRecientes);
-
-            // Crear y mostrar notificaciones para los eventos más recientes
-            eventosRecientes.forEach((evento) => {
-                let mensaje = "";
-                if (evento.event_type === "going_up_critical") {
-                    mensaje = "Hay un nuevo evento crítico.";
-                } else if (evento.event_type === "going_down_warning") {
-                    mensaje = "Hay un nuevo evento peligroso.";
-                }
-                // Obtener la fecha y hora actual
-                const fechaHoraActual = new Date().toLocaleString();
-                // Crear y mostrar la notificación con la fecha y hora actual
-                chrome.notifications.create(null, {
-                    type: "basic",
-                    iconUrl: "images/icon128.png",
-                    title: "¡Nuevo evento!",
-                    message:
-                        mensaje +
-                        ", en el agente con id de agente" +
-                        idagent +
-                        ", con fecha y hora: " +
-                        fechaHoraActual,
-                });
-            });
-
-            // Actualizar los eventos almacenados
-            eventosAnteriores = nuevosEventos;
-
-            // Envía una respuesta al popup
-            callback({ success: true });
-        })
-        .catch((error) => {
-            console.error("Error al obtener datos de la API:", error);
-            callback({ success: false });
+          }
+          console.log("Evento normal");
         });
+      }
+
+      // Actualizar los eventos almacenados
+      eventosAnteriores = nuevosEventos;
+
+      // Enviar la data al popup
+      chrome.runtime.sendMessage({
+        action: "apiData",
+        eventos: nuevosEventos,
+      });
+    })
+    .catch((error) => {
+      console.error("Error al obtener datos de la API:", error);
+    });
 }
 
-function callAPIRepeatedly() {
-    // Llamar a la función por primera vez
-    checkAPIForChanges();
-
-    // Establecer intervalo para llamar a la función cada minuto
-    setInterval(() => {
-        checkAPIForChanges((response) => {
-            if (response.success) {
-                console.log("Llamada al API realizada exitosamente.");
-            } else {
-                console.error("Error al realizar la llamada al API.");
-            }
-        });
-    }, 10000); // 10000 milisegundos = 10 segundos
-}
-
-// Llamar a la función para iniciar la llamada periódica al API
-callAPIRepeatedly();
+// Establecer intervalo para llamar a la función cada 10 segundos
+setInterval(checkAPIForChanges, 10000);

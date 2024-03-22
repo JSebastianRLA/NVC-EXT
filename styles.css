@@ -4,6 +4,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     padding: 20px;
+    width: 500px;
   }
   
   h1 {
@@ -17,7 +18,7 @@ body {
   
   input[type="text"],
   input[type="password"] {
-    width: 200px;
+    width: 97%;
     padding: 5px;
     margin-bottom: 10px;
   }
@@ -33,4 +34,21 @@ body {
   button:hover {
     background-color: #0056b3;
   }
+
+
+  .event-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .event-table th, .event-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .event-table th {
+    background-color: #f2f2f2;
+  }
+  
   
