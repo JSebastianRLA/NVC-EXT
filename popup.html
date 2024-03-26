@@ -6,20 +6,22 @@
     <title>Popup</title>
     <link rel="stylesheet" href="styles.css" />
     <!-- Enlazar el archivo de estilos CSS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script src="popup.js" defer></script>
   </head>
   <body>
     <h1>Extensión de Chrome</h1>
-    <label for="dns">DNS:</label>
-    <input type="text" id="dns" /><br /><br />
-    <label for="apiPass">Contraseña de API:</label>
-    <input type="password" id="apiPass" /><br /><br />
-    <label for="username">Nombre de usuario:</label>
-    <input type="text" id="username" /><br /><br />
-    <label for="password">Contraseña:</label>
-    <input type="password" id="password" /><br /><br />
     <button id="checkButton">Ver info</button>
+    <div id="formContainer">
+      <label for="dns">DNS:</label>
+      <input type="text" id="dns" /><br /><br />
+      <label for="apiPass">Contraseña de API:</label>
+      <input type="password" id="apiPass" /><br /><br />
+      <label for="username">Nombre de usuario:</label>
+      <input type="text" id="username" /><br /><br />
+      <label for="password">Contraseña:</label>
+      <input type="password" id="password" /><br /><br />
+    </div>
+    <!-- <button id="toggleButton">Mostrar/Ocultar</button> -->
     <div id="result"></div>
   </body>
 </html>

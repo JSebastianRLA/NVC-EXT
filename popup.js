@@ -1,13 +1,33 @@
+// Variables globales para almacenar las credenciales
+let dns, apiPass, username, password;
+
 document.addEventListener("DOMContentLoaded", function () {
+  const toggleButton = document.createElement("button");
+  toggleButton.textContent = "Mostrar/Ocultar";
+  toggleButton.id = "toggleButton";
+  document.body.insertBefore(
+    toggleButton,
+    document.getElementById("formContainer")
+  );
+
+  toggleButton.addEventListener("click", function () {
+    const formContainer = document.getElementById("formContainer");
+    if (formContainer.style.display === "none") {
+      formContainer.style.display = "block";
+    } else {
+      formContainer.style.display = "none";
+    }
+  });
+
   const checkButton = document.getElementById("checkButton");
   const resultDiv = document.getElementById("result");
 
   // Función para guardar las credenciales en el almacenamiento local
   function saveCredentials() {
-    const dns = document.getElementById("dns").value;
-    const apiPass = document.getElementById("apiPass").value;
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    dns = document.getElementById("dns").value;
+    apiPass = document.getElementById("apiPass").value;
+    username = document.getElementById("username").value;
+    password = document.getElementById("password").value;
 
     // Almacenar las credenciales en el almacenamiento local
     chrome.storage.local.set({
@@ -22,22 +42,21 @@ document.addEventListener("DOMContentLoaded", function () {
   chrome.storage.local.get(
     ["dns", "apiPass", "username", "password"],
     function (items) {
-      document.getElementById("dns").value = items.dns || "";
-      document.getElementById("apiPass").value = items.apiPass || "";
-      document.getElementById("username").value = items.username || "";
-      document.getElementById("password").value = items.password || "";
+      dns = items.dns || "";
+      apiPass = items.apiPass || "";
+      username = items.username || "";
+      password = items.password || "";
+
+      document.getElementById("dns").value = dns;
+      document.getElementById("apiPass").value = apiPass;
+      document.getElementById("username").value = username;
+      document.getElementById("password").value = password;
     }
   );
 
   checkButton.addEventListener("click", function () {
     // Guardar las credenciales antes de realizar la verificación de la API
     saveCredentials();
-
-    // Obtener los valores de los campos de entrada
-    const dns = document.getElementById("dns").value;
-    const apiPass = document.getElementById("apiPass").value;
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
 
     resultDiv.innerText = "Verificando API...";
 
@@ -63,7 +82,20 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
   });
+
+  // Agregar event listener a los botones de validar eventos
+  document.querySelectorAll(".validate-button").forEach((item) => {
+    item.addEventListener("click", (event) => {
+      const idEvento = item.getAttribute("data-id");
+      imprimirMensaje(idEvento); // Llama a la función imprimirMensaje con el ID del evento
+    });
+  });
 });
+
+// Función para imprimir un mensaje con el ID del evento
+function imprimirMensaje(idEvento) {
+  console.log("Hola mundo " + idEvento);
+}
 
 // Escuchar mensajes del script de fondo
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -71,12 +103,25 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     // Procesar los datos recibidos de la API
     const eventData = message.eventos;
 
-    // Construir la tabla HTML
+    // Filtrar los eventos según las condiciones especificadas
+    const filteredEvents = eventData.filter((event) => {
+      const event_type = event.evento;
+      const estado = event.estado;
+      return (
+        (event.event_type === "going_up_warning" ||
+          event.event_type === "going_down_warning" ||
+          event.event_type === "going_down_critical" ||
+          event.event_type === "going_up_critical") &&
+        event.estado === "0"
+      );
+    });
+
+    // Construir la tabla HTML con los eventos filtrados
     let tableHTML = '<table class="event-table">';
     tableHTML +=
       "<tr><th>Evento</th><th>ID del Agente</th><th>ID del Evento</th></tr>";
-    eventData.forEach((event) => {
-      tableHTML += `<tr><td>${event.evento}</td><td>${event.id_agente}</td><td>${event.id_evento}</td></tr>`;
+    filteredEvents.forEach((event) => {
+      tableHTML += `<tr><td>${event.evento}</td><td>${event.id_agente}</td><td><button class="validate-button" data-id="${event.id_evento}">Validar</button></td></tr>`;
     });
     tableHTML += "</table>";
 

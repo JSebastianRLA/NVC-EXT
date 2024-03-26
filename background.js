@@ -63,6 +63,7 @@ function checkAPIForChanges() {
         eventosNuevos.forEach((evento) => {
           if (
             evento.event_type === "going_up_critical" ||
+            evento.event_type === "going_down_critical" ||
             evento.event_type === "going_down_warning" ||
             evento.event_type === "going_up_warning"
           ) {
