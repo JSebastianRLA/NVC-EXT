@@ -107,4 +107,4 @@ function checkAPIForChanges() {
 }
 
 // Establecer intervalo para llamar a la función cada 10 segundos
-setInterval(checkAPIForChanges, 10000);
+setInterval(checkAPIForChanges, 4000);
