@@ -124,26 +124,42 @@ document.addEventListener("DOMContentLoaded", function () {
       const eventData = message.eventos;
 
       // Filtrar los eventos según las condiciones especificadas
+      // Filtrar los eventos según las condiciones especificadas
       const filteredEvents = eventData.filter((event) => {
         const event_type = event.evento;
         const estado = event.estado;
-        return (
-          (event.event_type === "going_up_warning" ||
-            event.event_type === "going_down_warning" ||
-            event.event_type === "going_down_critical" ||
-            event.event_type === "going_up_critical") &&
-          event.estado === "0"
-        );
+        let estadClass = "";
+        if (
+          event.event_type === "going_up_warning" ||
+          event.event_type === "going_down_warning"
+        ) {
+          estadClass = "estadoYe";
+        } else if (
+          event.event_type === "going_down_critical" ||
+          event.event_type === "going_up_critical"
+        ) {
+          estadClass = "estadoRe";
+        }
+        return estadClass && event.estado === "0";
       });
 
       // Construir la tabla HTML con los eventos filtrados
       let tableHTML = "";
-      filteredEvents.forEach((event) => {
-        tableHTML += `<tr><td>${event.evento}</td><td>${event.id_agente}</td>`;
-        // Crear el nuevo botón y agregar el evento de clic
-        tableHTML += `<td><button class="new-button" data-id="${event.id_evento}">Nuevo Botón</button></td></tr>`;
-      });
 
+      // Declarar estadClass antes del ciclo
+      let estadClass = "";
+
+      for (const event of filteredEvents) {
+        estadClass =
+          event.event_type === "going_up_warning" ||
+          event.event_type === "going_down_warning"
+            ? "estadoYe"
+            : "estadoRe";
+
+        tableHTML += `<tr><td><div class='${estadClass}'></div></td><td>${event.evento}</td><td>${event.id_agente}</td>`;
+        // Crear el nuevo botón y agregar el evento de clic
+        tableHTML += `<td><div class="BtnVal"><button title="Enviar validación" alt="Validar" class="new-button" data-id="${event.id_evento}"><i class="fa-solid fa-square-check"></i></button></div></td></tr>`;
+      }
       // Agregar las filas a la tabla existente
       const resultTableBody = document.getElementById("eventTableBody");
       resultTableBody.innerHTML = tableHTML;

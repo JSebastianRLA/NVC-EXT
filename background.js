@@ -34,7 +34,7 @@ function checkAPIForChanges() {
   // Construir la URL de la API utilizando las credenciales almacenadas
   const { dns, apiPass, username, password } = credentials;
   const apiUrl = `https://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
-
+  console.log(apiUrl);
   // Obtener los datos de la API
   fetch(apiUrl)
     .then((response) => {
@@ -69,6 +69,7 @@ function checkAPIForChanges() {
           ) {
             console.log(evento.event_type);
             let mensaje = "";
+
             switch (evento.event_type) {
               case "going_up_critical":
                 mensaje = "Hay un nuevo evento crítico.";

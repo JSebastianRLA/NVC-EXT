@@ -10,43 +10,42 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>Popup</title>
+    <title>Nvc Monitoring</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="popup.js" defer></script>
-    <style>
-      #formContainer,
-      #result {
-        display: none; /* Ocultar el contenedor del formulario y el resultado */
-      }
-    </style>
   </head>
   <body>
-    <h1>Extensión de Chrome</h1>
+    <div class="imgLogo">
+      <img src="/images/310x47.png" alt="Logo NVC Monitoring" />
+    </div>
     <div id="buttonContainer">
-      <button id="checkButton">
+      <button class="btnInfosExten" id="checkButton">
         <i class="fa-solid fa-eye-low-vision"></i>
       </button>
-      <button id="toggleButton"><i class="fa-solid fa-gears"></i></button>
+      <button class="btnInfosExten" id="toggleButton">
+        <i class="fa-solid fa-gears"></i>
+      </button>
     </div>
 
     <div id="formContainer">
       <label for="dns">DNS:</label>
-      <input type="text" id="dns" /><br /><br />
+      <input type="text" id="dns" data-real-value="" />
       <label for="apiPass">Contraseña de API:</label>
-      <input type="password" id="apiPass" /><br /><br />
+      <input type="password" id="apiPass" data-real-value="" />
       <label for="username">Nombre de usuario:</label>
-      <input type="text" id="username" /><br /><br />
+      <input type="text" id="username" data-real-value="" />
       <label for="password">Contraseña:</label>
-      <input type="password" id="password" /><br /><br />
+      <input type="password" id="password" data-real-value="" />
     </div>
 
     <div id="result">
-      <div id="loadingIndicator" style="display: none">
-        <img src="/images/spinner.gif" alt="Cargando..." />
+      <div id="loadingIndicator">
+        <img class="spinner" src="/images/spinner.gif" alt="Cargando..." />
       </div>
       <table id="eventTable" class="event-table">
         <thead>
           <tr>
+            <th>Estado</th>
             <th>Evento</th>
             <th>ID del Agente</th>
             <th>ID del Evento</th>
