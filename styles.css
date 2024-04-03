@@ -176,7 +176,7 @@ h1 {
 
 /* Estilo para las filas al pasar el mouse */
 .event-table tbody tr:nth-of-type(even) {
-  background-color: #d9d9d9; /* Color de fondo para filas pares */
+  background-color: #e6e6e6; /* Color de fondo para filas pares */
 }
 
 .event-table tbody tr:last-of-type {
@@ -198,17 +198,15 @@ h1 {
   color: #007bff;
 }
 .estadoYe {
-  background-color: #fcab10;
-  width: 35px;
-  height: 10px;
-  border-radius: 10px;
+  color: #fcab10;
+  font-size: 25px;
+  margin-left: 7px;
 }
 
 .estadoRe {
-  background-color: #e63c52;
-  width: 35px;
-  height: 10px;
-  border-radius: 10px;
+  color: #e63c52;
+  font-size: 25px;
+  margin-left: 7px; 
 }
 .BtnVal {
   display: flex;

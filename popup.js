@@ -129,15 +129,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const event_type = event.evento;
         const estado = event.estado;
         let estadClass = "";
+        let iconType = "";
         if (
           event.event_type === "going_up_warning" ||
           event.event_type === "going_down_warning"
         ) {
+          iconType = "fa-solid fa-triangle-exclamation";
           estadClass = "estadoYe";
         } else if (
           event.event_type === "going_down_critical" ||
           event.event_type === "going_up_critical"
         ) {
+          iconType = "fa-solid fa-circle-exclamation";
           estadClass = "estadoRe";
         }
         return estadClass && event.estado === "0";
@@ -146,6 +149,8 @@ document.addEventListener("DOMContentLoaded", function () {
       // Construir la tabla HTML con los eventos filtrados
       let tableHTML = "";
 
+      // Declarar iconType antes del ciclo
+      let iconType = "";
       // Declarar estadClass antes del ciclo
       let estadClass = "";
 
@@ -156,7 +161,13 @@ document.addEventListener("DOMContentLoaded", function () {
             ? "estadoYe"
             : "estadoRe";
 
-        tableHTML += `<tr><td><div class='${estadClass}'></div></td><td>${event.evento}</td><td>${event.id_agente}</td>`;
+        iconType =
+          event.event_type === "going_up_warning" ||
+          event.event_type === "going_down_warning"
+            ? "fa-solid fa-triangle-exclamation"
+            : "fa-solid fa-circle-exclamation";
+
+        tableHTML += `<tr><td><div class='${estadClass}'><i class='${iconType}'></i></div></td><td>${event.evento}</td><td>${event.id_agente}</td>`;
         // Crear el nuevo botón y agregar el evento de clic
         tableHTML += `<td><div class="BtnVal"><button title="Enviar validación" alt="Validar" class="new-button" data-id="${event.id_evento}"><i class="fa-solid fa-square-check"></i></button></div></td></tr>`;
       }
