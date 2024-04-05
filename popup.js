@@ -3,7 +3,6 @@ let dns, apiPass, username, password;
 
 document.addEventListener("DOMContentLoaded", function () {
   const buttonContainer = document.getElementById("buttonContainer");
-
   document
     .getElementById("toggleButton")
     .addEventListener("click", function () {
@@ -160,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
           event.event_type === "going_down_warning"
             ? "estadoYe"
             : "estadoRe";
-
         iconType =
           event.event_type === "going_up_warning" ||
           event.event_type === "going_down_warning"
