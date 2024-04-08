@@ -58,9 +58,9 @@ function checkAPIForChanges() {
       console.log(data.data[0].event_type);
       console.log("Eventos nuevos filtrados:", eventosNuevos);
 
-      let audioCritico = new Audio(chrome.runtime.getURL("sounds/s1.mp3"));
-      let audioPeligroso = new Audio(chrome.runtime.getURL("sounds/s2.mp3"));
-      
+      // let audioCritico = new Audio(chrome.runtime.getURL("sounds/s1.mp3"));
+      // let audioPeligroso = new Audio(chrome.runtime.getURL("sounds/s2.mp3"));
+
       // Si hay eventos nuevos, mostrar una notificación
       if (eventosNuevos.length > 0) {
         eventosNuevos.forEach((evento) => {
@@ -72,23 +72,23 @@ function checkAPIForChanges() {
           ) {
             console.log(evento.event_type);
             let mensaje = "";
-      
+
             switch (evento.event_type) {
               case "going_up_critical":
                 mensaje = "Hay un nuevo evento crítico.";
-                audioCritico.play();
+                // audioCritico.play();
                 break;
               case "going_down_critical":
                 mensaje = "Hay un nuevo evento crítico.";
-                audioCritico.play();
+                // audioCritico.play();
                 break;
               case "going_down_warning":
                 mensaje = "Hay un nuevo evento peligroso.";
-                audioPeligroso.play();
+                // audioPeligroso.play();
                 break;
               case "going_up_warning":
                 mensaje = "Hay un nuevo evento peligroso.";
-                audioPeligroso.play();
+                // audioPeligroso.play();
                 break;
             }
             const fechaHoraActual = new Date().toLocaleString();
@@ -102,7 +102,7 @@ function checkAPIForChanges() {
           console.log("Evento normal");
         });
       }
-      
+
       // Actualizar los eventos almacenados
       eventosAnteriores = nuevosEventos;
 
@@ -115,7 +115,13 @@ function checkAPIForChanges() {
     .catch((error) => {
       console.error("Error al obtener datos de la API:", error);
     });
+  // Si no hay eventos nuevos, mostrar el mensaje "Sin eventos nuevos"
+  if (eventosNuevos.length === 0) {
+    document.getElementById("noEventsMessage").style.display = "block";
+  } else {
+    document.getElementById("noEventsMessage").style.display = "none";
+  }
 }
 
-// Establecer intervalo para llamar a la función cada 1 minuto  
-setInterval(checkAPIForChanges, 60000);
+// Establecer intervalo para llamar a la función cada 1 minuto
+setInterval(checkAPIForChanges, 4000);
