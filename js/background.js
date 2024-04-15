@@ -58,9 +58,6 @@ function checkAPIForChanges() {
       console.log(data.data[0].event_type);
       console.log("Eventos nuevos filtrados:", eventosNuevos);
 
-      // let audioCritico = new Audio(chrome.runtime.getURL("sounds/s1.mp3"));
-      // let audioPeligroso = new Audio(chrome.runtime.getURL("sounds/s2.mp3"));
-
       // Si hay eventos nuevos, mostrar una notificación
       if (eventosNuevos.length > 0) {
         eventosNuevos.forEach((evento) => {
@@ -123,5 +120,5 @@ function checkAPIForChanges() {
   }
 }
 
-// Establecer intervalo para llamar a la función cada 1 minuto
-setInterval(checkAPIForChanges, 4000);
+// Establecer intervalo para llamar a la función cada 10 segundos
+setInterval(checkAPIForChanges, 10000);
