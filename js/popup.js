@@ -123,7 +123,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const eventData = message.eventos;
 
       // Filtrar los eventos según las condiciones especificadas
-      // Filtrar los eventos según las condiciones especificadas
       const filteredEvents = eventData.filter((event) => {
         const event_type = event.evento;
         const estado = event.estado;

@@ -86,7 +86,17 @@ h1 {
   background-color: transparent;
   color: #022243;
 }
+#SoundAlert {
+  scale: 1.7;
+  margin-left: 2px;
+  border: none;
+  background-color: transparent;
+  color: #022243;
+}
 #toggleButton:hover {
+  color: #007bff;
+}
+#SoundAlert:hover {
   color: #007bff;
 }
 #checkButton:hover {
@@ -206,7 +216,7 @@ h1 {
 .estadoRe {
   color: #e63c52;
   font-size: 25px;
-  margin-left: 7px; 
+  margin-left: 7px;
 }
 .BtnVal {
   display: flex;
