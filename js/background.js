@@ -1,7 +1,6 @@
 // Definir una variable global para almacenar las credenciales y los eventos anteriores
 let credentials = null;
 let eventosAnteriores = [];
-const maxEventosAlmacenados = 10; // Definir el máximo de eventos almacenados
 
 // Obtener las credenciales almacenadas del almacenamiento local al inicio
 chrome.storage.local.get(["credentials"], function (items) {
@@ -33,8 +32,9 @@ function checkAPIForChanges() {
 
     // Construir la URL de la API utilizando las credenciales almacenadas
     const { dns, apiPass, username, password } = credentials;
-    const apiUrl = `https://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
+    const apiUrl = `http://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
     console.log(apiUrl);
+
     // Obtener los datos de la API
     fetch(apiUrl)
         .then((response) => {
@@ -55,71 +55,65 @@ function checkAPIForChanges() {
                 );
             });
 
-            console.log(data.data[0].event_type);
+            console.log(nuevosEventos[0]?.event_type); // Asegúrate de que hay al menos un evento nuevo antes de acceder a event_type
             console.log("Eventos nuevos filtrados:", eventosNuevos);
 
-            // Si hay eventos nuevos, mostrar una notificación
+            // Si hay eventos nuevos, mostrar una notificación y reproducir el sonido
             if (eventosNuevos.length > 0) {
                 eventosNuevos.forEach((evento) => {
-                    if (
-                        evento.event_type === "going_up_critical" ||
-                        evento.event_type === "going_down_critical" ||
-                        evento.event_type === "going_down_warning" ||
-                        evento.event_type === "going_up_warning"
-                    ) {
-                        console.log(evento.event_type);
-                        let mensaje = "";
-
-                        switch (evento.event_type) {
-                            case "going_up_critical":
-                                mensaje = "Hay un nuevo evento crítico.";
-                                // audioCritico.play();
-                                break;
-                            case "going_down_critical":
-                                mensaje = "Hay un nuevo evento crítico.";
-                                // audioCritico.play();
-                                break;
-                            case "going_down_warning":
-                                mensaje = "Hay un nuevo evento peligroso.";
-                                // audioPeligroso.play();
-                                break;
-                            case "going_up_warning":
-                                mensaje = "Hay un nuevo evento peligroso.";
-                                // audioPeligroso.play();
-                                break;
-                        }
-                        const fechaHoraActual = new Date().toLocaleString();
-                        chrome.notifications.create(null, {
-                            type: "basic",
-                            iconUrl: "images/icon128.png",
-                            title: "¡Nuevo evento!",
-                            message: `${mensaje}, en el agente con ID ${evento.id_agente}, con fecha y hora: ${fechaHoraActual}`,
-                        });
+                    let mensaje = "";
+                    switch (evento.event_type) {
+                        case "going_up_critical":
+                            mensaje = "Hay un nuevo evento crítico en aumento.";
+                            break;
+                        case "going_down_critical":
+                            mensaje = "Hay un nuevo evento crítico en descenso.";
+                            break;
+                        case "going_down_warning":
+                            mensaje = "Hay un nuevo evento peligroso en descenso.";
+                            break;
+                        case "going_up_warning":
+                            mensaje = "Hay un nuevo evento peligroso en aumento.";
+                            break;
                     }
-                    console.log("Evento normal");
+                    const fechaHoraActual = new Date().toLocaleString();
+                    chrome.notifications.create(null, {
+                        type: 'basic',
+                        iconUrl: chrome.runtime.getURL('images/icon128.png'),
+                        title: '¡Nuevo evento!',
+                        message: `${mensaje}, en el agente con ID ${evento.id_agente}, con fecha y hora: ${fechaHoraActual}`,
+                    });
+
                 });
             }
 
             // Actualizar los eventos almacenados
             eventosAnteriores = nuevosEventos;
 
-            // Enviar la data al popup
+            // Enviar la data al popup si está abierto
             chrome.runtime.sendMessage({
                 action: "apiData",
                 eventos: nuevosEventos,
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.log("No se pudo enviar el mensaje: el popup no está abierto.");
+                }
+            });
+
+            // Enviar mensaje al popup para mostrar u ocultar el mensaje "Sin eventos nuevos" si está abierto
+            chrome.runtime.sendMessage({
+                action: "updateNoEventsMessage",
+                show: eventosNuevos.length === 0
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.log("No se pudo enviar el mensaje: el popup no está abierto.");
+                }
             });
         })
         .catch((error) => {
             console.error("Error al obtener datos de la API:", error);
         });
-    // Si no hay eventos nuevos, mostrar el mensaje "Sin eventos nuevos"
-    if (eventosNuevos.length === 0) {
-        document.getElementById("noEventsMessage").style.display = "block";
-    } else {
-        document.getElementById("noEventsMessage").style.display = "none";
-    }
 }
 
-// Establecer intervalo para llamar a la función cada 10 segundos
-setInterval(checkAPIForChanges, 10000);
-
+// Establecer intervalo para llamar a la función cada 5000 milisegundos (5 segundos)
+setInterval(checkAPIForChanges, 5000);

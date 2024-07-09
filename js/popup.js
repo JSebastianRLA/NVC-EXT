@@ -3,13 +3,11 @@ let dns, apiPass, username, password;
 
 document.addEventListener("DOMContentLoaded", function () {
     const buttonContainer = document.getElementById("buttonContainer");
-    document
-        .getElementById("toggleButton")
-        .addEventListener("click", function () {
-            const formContainer = document.getElementById("formContainer");
-            formContainer.style.display =
-                formContainer.style.display === "none" ? "block" : "none";
-        });
+    document.getElementById("toggleButton").addEventListener("click", function () {
+        const formContainer = document.getElementById("formContainer");
+        formContainer.style.display = formContainer.style.display === "none" ? "block" : "none";
+    });
+
     const formContainer = document.getElementById("formContainer");
     formContainer.style.display = "none";
 
@@ -33,20 +31,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Recuperar las credenciales almacenadas del almacenamiento local y establecerlas en los campos de entrada
-    chrome.storage.local.get(
-        ["dns", "apiPass", "username", "password"],
-        function (items) {
-            dns = items.dns || "";
-            apiPass = items.apiPass || "";
-            username = items.username || "";
-            password = items.password || "";
+    chrome.storage.local.get(["dns", "apiPass", "username", "password"], function (items) {
+        dns = items.dns || "";
+        apiPass = items.apiPass || "";
+        username = items.username || "";
+        password = items.password || "";
 
-            document.getElementById("dns").value = dns;
-            document.getElementById("apiPass").value = apiPass;
-            document.getElementById("username").value = username;
-            document.getElementById("password").value = password;
-        }
-    );
+        document.getElementById("dns").value = dns;
+        document.getElementById("apiPass").value = apiPass;
+        document.getElementById("username").value = username;
+        document.getElementById("password").value = password;
+    });
 
     checkButton.addEventListener("click", function () {
         // Mostrar el spinner
@@ -92,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para validar un evento por su ID
     function validarEventoPorId(idEvento) {
         // Construir la URL de la API con los parámetros necesarios
-        const url = `https://${dns}/pandora_console/include/api.php?op=set&op2=validate_event_by_id&id=${idEvento}&apipass=${apiPass}&user=${username}&pass=${password}`;
+        const url = `http://${dns}/pandora_console/include/api.php?op=set&op2=validate_event_by_id&id=${idEvento}&apipass=${apiPass}&user=${username}&pass=${password}`;
 
         // Realizar la solicitud HTTP utilizando fetch
         fetch(url)
@@ -113,32 +108,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Escuchar mensajes del script de fondo
-    chrome.runtime.onMessage.addListener(function (
-        message,
-        sender,
-        sendResponse
-    ) {
+    chrome.runtime.onMessage.addListener(function (message, _sender, _sendResponse) {
         if (message.action === "apiData") {
             // Procesar los datos recibidos de la API
             const eventData = message.eventos;
 
             // Filtrar los eventos según las condiciones especificadas
             const filteredEvents = eventData.filter((event) => {
-                const event_type = event.evento;
-                const estado = event.estado;
                 let estadClass = "";
-                let iconType = "";
                 if (
                     event.event_type === "going_up_warning" ||
                     event.event_type === "going_down_warning"
                 ) {
-                    iconType = "fa-solid fa-triangle-exclamation";
                     estadClass = "estadoYe";
                 } else if (
                     event.event_type === "going_down_critical" ||
                     event.event_type === "going_up_critical"
                 ) {
-                    iconType = "fa-solid fa-circle-exclamation";
                     estadClass = "estadoRe";
                 }
                 return estadClass && event.estado === "0";
@@ -147,20 +133,13 @@ document.addEventListener("DOMContentLoaded", function () {
             // Construir la tabla HTML con los eventos filtrados
             let tableHTML = "";
 
-            // Declarar iconType antes del ciclo
-            let iconType = "";
-            // Declarar estadClass antes del ciclo
-            let estadClass = "";
-
             for (const event of filteredEvents) {
-                estadClass =
-                    event.event_type === "going_up_warning" ||
-                        event.event_type === "going_down_warning"
+                const estadClass =
+                    event.event_type === "going_up_warning" || event.event_type === "going_down_warning"
                         ? "estadoYe"
                         : "estadoRe";
-                iconType =
-                    event.event_type === "going_up_warning" ||
-                        event.event_type === "going_down_warning"
+                const iconType =
+                    event.event_type === "going_up_warning" || event.event_type === "going_down_warning"
                         ? "fa-solid fa-triangle-exclamation"
                         : "fa-solid fa-circle-exclamation";
 
