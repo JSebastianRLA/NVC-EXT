@@ -26,14 +26,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 // Definir la función para verificar cambios en la API
 function checkAPIForChanges() {
     if (!credentials) {
-        console.log("Faltan credenciales para realizar la consulta a la API.");
+        // console.log("Faltan credenciales para realizar la consulta a la API.");
         return;
     }
 
     // Construir la URL de la API utilizando las credenciales almacenadas
     const { dns, apiPass, username, password } = credentials;
     const apiUrl = `http://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
-    console.log(apiUrl);
+    // console.log(apiUrl);
 
     // Obtener los datos de la API
     fetch(apiUrl)
@@ -44,9 +44,9 @@ function checkAPIForChanges() {
             return response.json();
         })
         .then((data) => {
-            console.log(data);
+            // console.log(data);
             const nuevosEventos = data.data;
-            console.log("Eventos nuevos recibidos:", nuevosEventos.length);
+            // console.log("Eventos nuevos recibidos:", nuevosEventos.length);
 
             // Filtrar los eventos que no estén en la lista de eventos almacenados
             const eventosNuevos = nuevosEventos.filter((evento) => {
@@ -55,8 +55,8 @@ function checkAPIForChanges() {
                 );
             });
 
-            console.log(nuevosEventos[0]?.event_type); // Asegúrate de que hay al menos un evento nuevo antes de acceder a event_type
-            console.log("Eventos nuevos filtrados:", eventosNuevos);
+            // console.log(nuevosEventos[0]?.event_type); // Asegúrate de que hay al menos un evento nuevo antes de acceder a event_type
+            // console.log("Eventos nuevos filtrados:", eventosNuevos);
 
             // Si hay eventos nuevos, mostrar una notificación y reproducir el sonido
             if (eventosNuevos.length > 0) {
@@ -64,16 +64,16 @@ function checkAPIForChanges() {
                     let mensaje = "";
                     switch (evento.event_type) {
                         case "going_up_critical":
-                            mensaje = "Hay un nuevo evento crítico en aumento.";
+                            mensaje = "Hay un nuevo evento crítico en aumento";
                             break;
                         case "going_down_critical":
-                            mensaje = "Hay un nuevo evento crítico en descenso.";
+                            mensaje = "Hay un nuevo evento crítico en descenso";
                             break;
                         case "going_down_warning":
-                            mensaje = "Hay un nuevo evento peligroso en descenso.";
+                            mensaje = "Hay un nuevo evento peligroso en descenso";
                             break;
                         case "going_up_warning":
-                            mensaje = "Hay un nuevo evento peligroso en aumento.";
+                            mensaje = "Hay un nuevo evento peligroso en aumento";
                             break;
                     }
                     const fechaHoraActual = new Date().toLocaleString();
@@ -96,7 +96,7 @@ function checkAPIForChanges() {
                 eventos: nuevosEventos,
             }, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.log("No se pudo enviar el mensaje: el popup no está abierto.");
+                    // console.log("No se pudo enviar el mensaje: el popup no está abierto.");
                 }
             });
 
@@ -106,7 +106,7 @@ function checkAPIForChanges() {
                 show: eventosNuevos.length === 0
             }, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.log("No se pudo enviar el mensaje: el popup no está abierto.");
+                    // console.log("No se pudo enviar el mensaje: el popup no está abierto.");
                 }
             });
         })

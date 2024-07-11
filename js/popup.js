@@ -73,16 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
 
-        // Ocultar el spinner después de 3 segundos
+        // Ocultar el spinner después de 2.5 segundos
         setTimeout(function () {
             spinnerContainer.style.display = "none";
-        }, 3000);
+        }, 2500);
     });
-
-    // Función para imprimir un mensaje con el ID del evento
-    function imprimirMensaje(idEvento) {
-        console.log("Hola mundo " + idEvento);
-    }
 
     // Función para validar un evento por su ID
     function validarEventoPorId(idEvento) {
@@ -162,10 +157,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Mostrar el spinner
                     spinnerContainer.style.display = "block";
 
-                    // Ocultar el spinner después de 3 segundos
+                    // Ocultar el spinner después de 2.5 segundos
                     setTimeout(function () {
                         spinnerContainer.style.display = "none";
-                    }, 3000);
+                    }, 2500);
 
                     // Validar el evento por su ID
                     validarEventoPorId(eventId);
