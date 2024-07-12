@@ -33,7 +33,7 @@ function checkAPIForChanges() {
     // Construir la URL de la API utilizando las credenciales almacenadas
     const { dns, apiPass, username, password } = credentials;
     const apiUrl = `http://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
-    // console.log(apiUrl);
+    console.log(apiUrl);
 
     // Obtener los datos de la API
     fetch(apiUrl)
@@ -107,5 +107,5 @@ function checkAPIForChanges() {
         });
 }
 
-// Establecer intervalo para llamar a la función cada 5000 milisegundos (5 segundos)
-setInterval(checkAPIForChanges, 5000);
+// Establecer intervalo para llamar a la función cada 2500 milisegundos (2.5 segundos)
+setInterval(checkAPIForChanges, 2500);
