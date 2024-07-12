@@ -152,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 button.addEventListener("click", function () {
                     const eventId = this.getAttribute("data-id");
                     console.log("ID del evento:", eventId);
-                    imprimirMensaje(eventId);
 
                     // Mostrar el spinner
                     spinnerContainer.style.display = "block";

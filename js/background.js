@@ -62,20 +62,12 @@ function checkAPIForChanges() {
             if (eventosNuevos.length > 0) {
                 eventosNuevos.forEach((evento) => {
                     let mensaje = "";
-                    switch (evento.event_type) {
-                        case "going_up_critical":
-                            mensaje = "Hay un nuevo evento crítico en aumento";
-                            break;
-                        case "going_down_critical":
-                            mensaje = "Hay un nuevo evento crítico en descenso";
-                            break;
-                        case "going_down_warning":
-                            mensaje = "Hay un nuevo evento peligroso en descenso";
-                            break;
-                        case "going_up_warning":
-                            mensaje = "Hay un nuevo evento peligroso en aumento";
-                            break;
+                    if (evento.event_type === "going_up_critical" || evento.event_type === "going_down_critical") {
+                        mensaje = "Hay un nuevo evento crítico";
+                    } else if (evento.event_type === "going_down_warning" || evento.event_type === "going_up_warning") {
+                        mensaje = "Hay un nuevo evento peligroso";
                     }
+
                     const fechaHoraActual = new Date().toLocaleString();
                     chrome.notifications.create(null, {
                         type: 'basic',
@@ -83,9 +75,9 @@ function checkAPIForChanges() {
                         title: '¡Nuevo evento!',
                         message: `${mensaje}, en el agente con ID ${evento.id_agente}, con fecha y hora: ${fechaHoraActual}`,
                     });
-
                 });
             }
+
 
             // Actualizar los eventos almacenados
             eventosAnteriores = nuevosEventos;
