@@ -77,8 +77,6 @@ function checkAPIForChanges() {
                     });
                 });
             }
-
-
             // Actualizar los eventos almacenados
             eventosAnteriores = nuevosEventos;
 
