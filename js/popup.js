@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Función para validar un evento por su ID
     function validarEventoPorId(idEvento) {
         // Construir la URL de la API con los parámetros necesarios
-        const url = `http://${dns}/pandora_console/include/api.php?op=set&op2=validate_event_by_id&id=${idEvento}&apipass=${apiPass}&user=${username}&pass=${password}`;
+        const url = `https://${dns}/pandora_console/include/api.php?op=set&op2=validate_event_by_id&id=${idEvento}&apipass=${apiPass}&user=${username}&pass=${password}`;
 
         // Realizar la solicitud HTTP utilizando fetch
         fetch(url)
