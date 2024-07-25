@@ -32,7 +32,7 @@ function checkAPIForChanges() {
 
     // Construir la URL de la API utilizando las credenciales almacenadas
     const { dns, apiPass, username, password } = credentials;
-    const apiUrl = `http://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
+    const apiUrl = `https://${dns}/pandora_console/include/api.php?op=get&op2=events&return_type=json&apipass=${apiPass}&user=${username}&pass=${password}`;
     console.log(apiUrl);
 
     // Obtener los datos de la API
